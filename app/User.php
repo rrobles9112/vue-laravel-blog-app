@@ -48,14 +48,6 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function post(){
 
-        return $this->hasMany('App\Posts');
-    }
-
-    public function taggables()
-    {
-        return $this->morphMany('App\Taggables', 'taggables');
-    }
 
 }

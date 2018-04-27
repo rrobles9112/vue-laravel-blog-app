@@ -4,7 +4,13 @@
 # * 'gtrp' and 'gtr' create a GET request with or without query parameters;
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
-
+###
 POST http://localhost:8000/api/auth/login?username=carlos@askmethod.com&password=ASKMethod
 
 ###
+
+POST http://localhost:8000/api/users
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTUyNDg0NzkwOSwiZXhwIjoxNTI0ODUxNTA5LCJuYmYiOjE1MjQ4NDc5MDksImp0aSI6IjlEMTVsYnl3NlNPTU5tYVEiLCJzdWIiOjEsInBydiI6Ijg3ZTBhZjFlZjlmZDE1ODEyZmRlYzk3MTUzYTE0ZTBiMDQ3NTQ2YWEifQ.-l8GZdk8UGXPshIBAPMDjw1ljEywcTVBiukbPRIZyus
+
+###
+

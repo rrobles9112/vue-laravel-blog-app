@@ -22,9 +22,7 @@
                         <li>
                             <router-link to="/admin/tags" class="nav-link">Tags</router-link>
                         </li>
-                        <li>
-                            <router-link to="/admin/users" class="nav-link">Users</router-link>
-                        </li>
+
                         <li class="nav-item dropdown">
 
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true">

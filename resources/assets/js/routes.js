@@ -6,6 +6,7 @@ import TagsList from './components/Tags/List.vue';
 import NewTags from './components/Tags/New.vue';
 import TagView from './components/Tags/View.vue';
 import EditView from './components/Tags/edit.vue'
+import RegisterUser from './components/Users/Register'
 
 export const routes = [{
         path: '/admin',
@@ -17,6 +18,10 @@ export const routes = [{
     {
         path: '/login',
         component: Login
+    },
+    {
+        path: '/register',
+        component: RegisterUser
     },
     {
         path: '/',
