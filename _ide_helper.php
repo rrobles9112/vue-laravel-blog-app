@@ -986,7 +986,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Assign a set of tags to a given binding.
+         * Assign a set of Tags to a given binding.
          *
          * @param array|string $abstracts
          * @param array|mixed $tags
@@ -2803,7 +2803,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Begin executing a new tags operation if the store supports it.
+         * Begin executing a new Tags operation if the store supports it.
          *
          * @param array|mixed $names
          * @return \Illuminate\Cache\TaggedCache 
@@ -8057,7 +8057,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Gets the Etags.
          *
-         * @return array The entity tags
+         * @return array The entity Tags
          * @static 
          */ 
         public static function getETags()

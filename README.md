@@ -17,7 +17,7 @@ npm install
 
 # generate a key for your application
 php artisan key:generate
-php artisan jwt:generate
+php artisan jwt:secret
 
 # create a local MySQL database (make sure you have MySQL up and running)
 mysql -u root

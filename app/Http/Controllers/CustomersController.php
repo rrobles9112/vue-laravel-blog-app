@@ -28,7 +28,7 @@ class CustomersController extends Controller
     }
 
     public function new(CreateCustomerRequest $request)
-    {
+    {   
         $customer = Customer::create($request->only(["name", "email", "phone", "website"]));
 
         return response()->json([

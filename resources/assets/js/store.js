@@ -8,7 +8,11 @@ export default {
         isLoggedIn: !!user,
         loading: false,
         auth_error: null,
-        customers: []
+        customers: [],
+        tags: [],
+        tagData:{}
+
+
     },
     getters: {
         isLoading(state) {
@@ -25,6 +29,9 @@ export default {
         },
         customers(state) {
             return state.customers;
+        },
+        tags(state){
+            return state.tags;
         }
     },
     mutations: {
@@ -51,6 +58,9 @@ export default {
         },
         updateCustomers(state, payload) {
             state.customers = payload;
+        },
+        updateTags(state, payload){
+            state.tags=payload
         }
     },
     actions: {
@@ -58,10 +68,18 @@ export default {
             context.commit("login");
         },
         getCustomers(context) {
+            
             axios.get('/api/customers')
             .then((response) => {
                 context.commit('updateCustomers', response.data.customers);
             })
+        },
+        getTags(context) {
+            axios.get('/api/tags')
+                .then((response) => {
+                    context.commit('updateTags', response.data.tags);
+                })
         }
+
     }
 };
