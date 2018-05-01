@@ -17,7 +17,7 @@
                     </template>
                     <template v-else>
                         <li>
-                            <router-link  to="/admin/posts" class="nav-link">Posts</router-link>
+                            <router-link  to="/admin/post" class="nav-link">Posts</router-link>
                         </li>
                         <li>
                             <router-link to="/admin/tags" class="nav-link">Tags</router-link>

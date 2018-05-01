@@ -10,7 +10,8 @@ export default {
         auth_error: null,
         customers: [],
         tags: [],
-        tagData:{}
+        posts: [],
+        users:[]
 
 
     },
@@ -31,6 +32,9 @@ export default {
             return state.customers;
         },
         tags(state){
+            return state.tags;
+        },
+        users(state){
             return state.tags;
         }
     },
@@ -61,6 +65,12 @@ export default {
         },
         updateTags(state, payload){
             state.tags=payload
+        },
+        updatePosts(state, payload) {
+            state.posts=payload
+        },
+        updateUsers(state, payload) {
+            state.users=payload
         }
     },
     actions: {
@@ -78,6 +88,22 @@ export default {
             axios.get('/api/tags')
                 .then((response) => {
                     context.commit('updateTags', response.data.tags);
+            })
+        },
+        getPost(context) {
+            axios.get('/api/posts')
+                .then((response) => {
+                    context.commit('updatePosts', response.data.posts);
+            })
+        },
+        getUsers(context) {
+            axios.get('/api/users')
+                .then((response) => {
+                    console.log(response.data.data);
+                    console.log(context.getters.currentUser.id)
+                    let othersUser = response.data.data.filter(item => item.id !== context.getters.currentUser.id)
+
+                    context.commit('updatePosts', othersUser);
                 })
         }
 

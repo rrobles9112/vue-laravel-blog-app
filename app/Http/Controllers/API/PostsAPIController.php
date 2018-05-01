@@ -2,29 +2,34 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Requests\API\CreateUserAPIRequest;
-use App\Http\Requests\API\UpdateUserAPIRequest;
-use App\Models\User;
-use App\Repositories\UserRepository;
+use App\Http\Requests\API\CreatePostsAPIRequest;
+use App\Http\Requests\API\UpdatePostsAPIRequest;
+use App\Models\Posts;
+use App\Repositories\PostsRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+
+
 
 /**
- * Class UserController
+ * Class PostsController
  * @package App\Http\Controllers\API
  */
 
-class UserAPIController extends AppBaseController
+class PostsAPIController extends AppBaseController
 {
-    /** @var  UserRepository */
-    private $userRepository;
+    /** @var  PostsRepository */
+    private $postsRepository;
 
-    public function __construct(UserRepository $userRepo)
+    public function __construct(PostsRepository $postsRepo)
     {
-        $this->userRepository = $userRepo;
+        $this->postsRepository = $postsRepo;
     }
 
     /**
@@ -32,10 +37,10 @@ class UserAPIController extends AppBaseController
      * @return Response
      *
      * @SWG\Get(
-     *      path="/users",
-     *      summary="Get a listing of the Users.",
-     *      tags={"User"},
-     *      description="Get all Users",
+     *      path="/posts",
+     *      summary="Get a listing of the Posts.",
+     *      tags={"Posts"},
+     *      description="Get all Posts",
      *      produces={"application/json"},
      *      @SWG\Response(
      *          response=200,
@@ -49,7 +54,7 @@ class UserAPIController extends AppBaseController
      *              @SWG\Property(
      *                  property="data",
      *                  type="array",
-     *                  @SWG\Items(ref="#/definitions/User")
+     *                  @SWG\Items(ref="#/definitions/Posts")
      *              ),
      *              @SWG\Property(
      *                  property="message",
@@ -61,32 +66,29 @@ class UserAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $this->userRepository->pushCriteria(new RequestCriteria($request));
-        $this->userRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $users = $this->userRepository->all();
+        $this->postsRepository->pushCriteria(new RequestCriteria($request));
+        $this->postsRepository->pushCriteria(new LimitOffsetCriteria($request));
+        $posts = $this->postsRepository->all();
 
-
-
-
-        return $this->sendResponse($users->toArray(), 'Users retrieved successfully');
+        return $this->sendResponse($posts->toArray(), 'Posts retrieved successfully');
     }
 
     /**
-     * @param CreateUserAPIRequest $request
+     * @param CreatePostsAPIRequest $request
      * @return Response
      *
      * @SWG\Post(
-     *      path="/users",
-     *      summary="Store a newly created User in storage",
-     *      tags={"User"},
-     *      description="Store User",
+     *      path="/posts",
+     *      summary="Store a newly created Posts in storage",
+     *      tags={"Posts"},
+     *      description="Store Posts",
      *      produces={"application/json"},
      *      @SWG\Parameter(
      *          name="body",
      *          in="body",
-     *          description="User that should be stored",
+     *          description="Posts that should be stored",
      *          required=false,
-     *          @SWG\Schema(ref="#/definitions/User")
+     *          @SWG\Schema(ref="#/definitions/Posts")
      *      ),
      *      @SWG\Response(
      *          response=200,
@@ -99,7 +101,7 @@ class UserAPIController extends AppBaseController
      *              ),
      *              @SWG\Property(
      *                  property="data",
-     *                  ref="#/definitions/User"
+     *                  ref="#/definitions/Posts"
      *              ),
      *              @SWG\Property(
      *                  property="message",
@@ -109,13 +111,16 @@ class UserAPIController extends AppBaseController
      *      )
      * )
      */
-    public function store(CreateUserAPIRequest $request)
+    public function store(CreatePostsAPIRequest $request)
     {
         $input = $request->all();
+        $user = $this->getAuthenticatedUser();
 
-        $users = $this->userRepository->create($input);
+        $input['users_id']=$user->getData()->user->id;
+        // print_r($input);
+        $posts = $this->postsRepository->create($input);
 
-        return $this->sendResponse($users->toArray(), 'User saved successfully');
+        return $this->sendResponse($posts->toArray(), 'Posts saved successfully');
     }
 
     /**
@@ -123,14 +128,14 @@ class UserAPIController extends AppBaseController
      * @return Response
      *
      * @SWG\Get(
-     *      path="/users/{id}",
-     *      summary="Display the specified User",
-     *      tags={"User"},
-     *      description="Get User",
+     *      path="/posts/{id}",
+     *      summary="Display the specified Posts",
+     *      tags={"Posts"},
+     *      description="Get Posts",
      *      produces={"application/json"},
      *      @SWG\Parameter(
      *          name="id",
-     *          description="id of User",
+     *          description="id of Posts",
      *          type="integer",
      *          required=true,
      *          in="path"
@@ -146,7 +151,7 @@ class UserAPIController extends AppBaseController
      *              ),
      *              @SWG\Property(
      *                  property="data",
-     *                  ref="#/definitions/User"
+     *                  ref="#/definitions/Posts"
      *              ),
      *              @SWG\Property(
      *                  property="message",
@@ -158,30 +163,30 @@ class UserAPIController extends AppBaseController
      */
     public function show($id)
     {
-        /** @var User $user */
-        $user = $this->userRepository->findWithoutFail($id);
+        /** @var Posts $posts */
+        $posts = $this->postsRepository->findWithoutFail($id);
 
-        if (empty($user)) {
-            return $this->sendError('User not found');
+        if (empty($posts)) {
+            return $this->sendError('Posts not found');
         }
 
-        return $this->sendResponse($user->toArray(), 'User retrieved successfully');
+        return $this->sendResponse($posts->toArray(), 'Posts retrieved successfully');
     }
 
     /**
      * @param int $id
-     * @param UpdateUserAPIRequest $request
+     * @param UpdatePostsAPIRequest $request
      * @return Response
      *
      * @SWG\Put(
-     *      path="/users/{id}",
-     *      summary="Update the specified User in storage",
-     *      tags={"User"},
-     *      description="Update User",
+     *      path="/posts/{id}",
+     *      summary="Update the specified Posts in storage",
+     *      tags={"Posts"},
+     *      description="Update Posts",
      *      produces={"application/json"},
      *      @SWG\Parameter(
      *          name="id",
-     *          description="id of User",
+     *          description="id of Posts",
      *          type="integer",
      *          required=true,
      *          in="path"
@@ -189,9 +194,9 @@ class UserAPIController extends AppBaseController
      *      @SWG\Parameter(
      *          name="body",
      *          in="body",
-     *          description="User that should be updated",
+     *          description="Posts that should be updated",
      *          required=false,
-     *          @SWG\Schema(ref="#/definitions/User")
+     *          @SWG\Schema(ref="#/definitions/Posts")
      *      ),
      *      @SWG\Response(
      *          response=200,
@@ -204,7 +209,7 @@ class UserAPIController extends AppBaseController
      *              ),
      *              @SWG\Property(
      *                  property="data",
-     *                  ref="#/definitions/User"
+     *                  ref="#/definitions/Posts"
      *              ),
      *              @SWG\Property(
      *                  property="message",
@@ -214,20 +219,20 @@ class UserAPIController extends AppBaseController
      *      )
      * )
      */
-    public function update($id, UpdateUserAPIRequest $request)
+    public function update($id, UpdatePostsAPIRequest $request)
     {
         $input = $request->all();
 
-        /** @var User $user */
-        $user = $this->userRepository->findWithoutFail($id);
+        /** @var Posts $posts */
+        $posts = $this->postsRepository->findWithoutFail($id);
 
-        if (empty($user)) {
-            return $this->sendError('User not found');
+        if (empty($posts)) {
+            return $this->sendError('Posts not found');
         }
 
-        $user = $this->userRepository->update($input, $id);
+        $posts = $this->postsRepository->update($input, $id);
 
-        return $this->sendResponse($user->toArray(), 'User updated successfully');
+        return $this->sendResponse($posts->toArray(), 'Posts updated successfully');
     }
 
     /**
@@ -235,14 +240,14 @@ class UserAPIController extends AppBaseController
      * @return Response
      *
      * @SWG\Delete(
-     *      path="/users/{id}",
-     *      summary="Remove the specified User from storage",
-     *      tags={"User"},
-     *      description="Delete User",
+     *      path="/posts/{id}",
+     *      summary="Remove the specified Posts from storage",
+     *      tags={"Posts"},
+     *      description="Delete Posts",
      *      produces={"application/json"},
      *      @SWG\Parameter(
      *          name="id",
-     *          description="id of User",
+     *          description="id of Posts",
      *          type="integer",
      *          required=true,
      *          in="path"
@@ -270,15 +275,43 @@ class UserAPIController extends AppBaseController
      */
     public function destroy($id)
     {
-        /** @var User $user */
-        $user = $this->userRepository->findWithoutFail($id);
+        /** @var Posts $posts */
+        $posts = $this->postsRepository->findWithoutFail($id);
 
-        if (empty($user)) {
-            return $this->sendError('User not found');
+        if (empty($posts)) {
+            return $this->sendError('Posts not found');
         }
 
-        $user->delete();
+        $posts->delete();
 
-        return $this->sendResponse($id, 'User deleted successfully');
+        return $this->sendResponse($id, 'Posts deleted successfully');
     }
+
+    // somewhere in your controller
+    public function getAuthenticatedUser()
+    {
+        try {
+
+            if (! $user = \Tymon\JWTAuth\Facades\JWTAuth::parseToken()->authenticate()) {
+                return response()->json(['user_not_found'], 404);
+            }
+
+        } catch (TokenExpiredException  $e) {
+
+            return response()->json(['token_expired'], $e->getStatusCode());
+
+        } catch (TokenInvalidException $e) {
+
+            return response()->json(['token_invalid'], $e->getStatusCode());
+
+        } catch (JWTException $e) {
+
+            return response()->json(['token_absent'], $e->getStatusCode());
+
+        }
+
+        // the token is valid and we have found the user via the sub claim
+        return response()->json(compact('user'));
+    }
+
 }

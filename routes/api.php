@@ -40,3 +40,5 @@ Route::group(['middleware' => 'jwt.auth'], function ($router) {
 
 
 Route::resource('users', 'API\UserAPIController');
+
+Route::resource('posts', 'API\PostsAPIController');

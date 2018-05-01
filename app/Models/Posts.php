@@ -7,11 +7,27 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @SWG\Definition(
- *      definition="User",
- *      required={""},
+ *      definition="Posts",
+ *      required={"title"},
  *      @SWG\Property(
  *          property="id",
  *          description="id",
+ *          type="integer",
+ *          format="int32"
+ *      ),
+ *      @SWG\Property(
+ *          property="title",
+ *          description="title",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="content",
+ *          description="content",
+ *          type="string"
+ *      ),
+ *      @SWG\Property(
+ *          property="user_id",
+ *          description="user_id",
  *          type="integer",
  *          format="int32"
  *      ),
@@ -29,18 +45,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *      )
  * )
  */
-class User extends Model
+class Posts extends Model
 {
     use SoftDeletes;
 
-    public $table = 'users';
+    public $table = 'posts';
     
 
-   protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at'];
 
 
     public $fillable = [
-        'name','email','password'
+        'title',
+        'content',
+        'users_id'
     ];
 
     /**
@@ -49,7 +67,9 @@ class User extends Model
      * @var array
      */
     protected $casts = [
-        
+        'title' => 'string',
+        'content' => 'string',
+        'users_id' => 'integer'
     ];
 
     /**
@@ -58,27 +78,13 @@ class User extends Model
      * @var array
      */
     public static $rules = [
-        'name'=>'required',
-        'email'=>'required',
-        'password'=>'required'
+        'title' => 'required',
+        'content'=>'required'
     ];
-
-    /**
-     * Set the password field hashed.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function setPasswordAttribute($value)
+    function user()
     {
-
-        $this->attributes['password'] = bcrypt($value);
         
-    }
-
-    public function posts()
-    {
-        return $this->hasMany('App\Models\Posts');
+        return $this->belongsTo('App\Models\User');
     }
     
 }
