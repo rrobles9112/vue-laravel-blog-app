@@ -15,6 +15,8 @@ Vue.use(VueGoodTable)
 
 const store = new Vuex.Store(StoreData);
 
+
+
 const router = new VueRouter({
     routes,
     mode: 'history'

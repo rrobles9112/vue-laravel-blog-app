@@ -16,6 +16,13 @@
                             <span class="help-block">This text is required</span>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="textinput">Taggables</label>
+                        <div class="col-md-12">
+                            <multiselect v-model="value" tag-placeholder="Add this as new tag" placeholder="Search or add a tag" label="name" track-by="code" :options="options" :multiple="true" :taggable="true" @tag="addTag"></multiselect>
+
+                        </div>
+                    </div>
 
                     <!-- Textarea -->
                     <div class="form-group">
@@ -47,75 +54,91 @@
 
 
 <script>
-    import validate from 'validate.js';
-    import {mapGetters} from 'vuex'
+import validate from "validate.js";
+import { mapGetters } from "vuex";
+import Multiselect from "vue-multiselect";
 
-    export default {
-        name: 'NewPost',
-        beforeMount(){
-          this.$store.dispatch('getUsers')
-          this.$store.dispatch('getTags')
-        },
-        data() {
-            return {
-                post: {
-                    title: '',
-                    content: ''
-                },
-                errors: null
-            }
-        },
-        computed:{
-            tags:mapGetters(['tags','users'])
-        },
-        methods: {
-            submit() {
+export default {
+  name: "NewPost",
+  components: { Multiselect },
+  beforeMount() {
+    this.$store.dispatch("getUsers");
+    this.$store.dispatch("getTags");
+  },
+  data() {
+    return {
+      post: {
+        title: "",
+        content: ""
+      },
+      errors: null,
+     value: [
+        { name: 'Javascript', code: 'js' }
+      ],
+      options: [
+        { name: 'Vue.js', code: 'vu' },
+        { name: 'Javascript', code: 'js' },
+        { name: 'Open Source', code: 'os' }
+      ]
 
-                this.errors = null;
-
-                const constraints = this.getConstraints();
-                console.log(constraints)
-                const errors = validate(this.$data.post, constraints);
-
-                if(errors) {
-                    this.errors = errors;
-                    return;
-                }
-
-                axios.post('/api/posts', this.$data.post)
-                    .then((response) => {
-
-                        this.$router.push('/admin/post');
-
-                    });
-
-            },
-            getConstraints() {
-                return {
-                    title: {
-                        presence: true,
-                        length: {
-                            minimum: 3,
-                            message: 'Must be required'
-                        }
-                    },
-                    content: {
-                        presence: true,
-                        length:{
-                            minimum:3,
-                            message:'Must be required'
-                        }
-                    }
-                };
-            }
-        }
     };
+  },
+  computed: {
+    tags: mapGetters(["tags", "users"])
+  },
+  methods: {
+    addTag (newTag) {
+      const tag = {
+        name: newTag,
+        code: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+      }
+      this.options.push(tag)
+      this.value.push(tag)
+    },
+    submit() {
+      this.errors = null;
+
+      const constraints = this.getConstraints();
+      console.log(constraints);
+      const errors = validate(this.$data.post, constraints);
+
+      if (errors) {
+        this.errors = errors;
+        return;
+      }
+
+      axios.post("/api/posts", this.$data.post).then(response => {
+        this.$router.push("/admin/post");
+      });
+    },
+    getConstraints() {
+      return {
+        title: {
+          presence: true,
+          length: {
+            minimum: 3,
+            message: "Must be required"
+          }
+        },
+        content: {
+          presence: true,
+          length: {
+            minimum: 3,
+            message: "Must be required"
+          }
+        }
+      };
+    }
+  }
+};
 </script>
 
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+
 <style type="text/css">
-    .errors {
-        background: lightcoral;
-        border-radius:5px;
-        padding: 21px 0 2px 0;
-    }
+.errors {
+  background: lightcoral;
+  border-radius: 5px;
+  padding: 21px 0 2px 0;
+}
 </style>
